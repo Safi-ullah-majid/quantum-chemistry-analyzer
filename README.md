@@ -1,5 +1,3 @@
-cd ~/Desktop/quantum-chemistry-analyzer-linux
-
 cat > README.md << 'EOF'
 <div align="center">
 
@@ -237,6 +235,3 @@ Found a bug? Have a feature request?
 [⬆ Back to Top](#-quantum-chemistry-analyzer)
 
 </div>
-EOF
-
-echo "✅ Beautiful README created!"
