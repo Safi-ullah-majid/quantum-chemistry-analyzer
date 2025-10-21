@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Chemistry Analyzer Pro</title>
+    
+    <!-- React & ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        #root {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6d28d9;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- Lucide React Icons (inline SVG components) -->
+    <script type="text/babel">
+        // Lucide Icons as React components
+        const Upload = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        );
+
+        const Download = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
+
+        const Settings = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m6-12-3 3m-6 6-3 3m12 0-3-3m-6-6-3-3m12 6h-6m-6 0H1"></path>
+            </svg>
+        );
+
+        const Zap = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+        );
+
+        const BarChart3 = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+            </svg>
+        );
+
+        const Eye = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        );
+
+        const Trash2 = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        );
+
+        const RefreshCw = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        );
+    </script>
+    
+    <!-- Main Application Code -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const AdvancedChemAnalyzer = () => {
+          const [files, setFiles] = useState([]);
+          const [activeFile, setActiveFile] = useState(null);
+          const [dosData, setDosData] = useState(null);
+          const [uvvisData, setUvvisData] = useState(null);
+          const [settings, setSettings] = useState({
+            dosSigma: 0.15,
+            uvvisSigma: 0.1,
+            dosRange: [-20, 10],
+            uvvisRange: [1, 7],
+            resolution: 2000,
+            showOccupied: true,
+            showVirtual: true,
+            normalizeUV: true,
+            lineWidth: 2,
+          });
+          const [showSettings, setShowSettings] = useState(false);
+          const [processing, setProcessing] = useState(false);
+          const dosCanvasRef = useRef(null);
+          const uvvisCanvasRef = useRef(null);
+
+          // Simulated file parsing
+          const parseFile = async (file) => {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                // Simulated data
+                const nMO = 50;
+                const homo = 24;
+                const moEnergies = Array.from({ length: nMO }, (_, i) => 
+                  -15 + (i / nMO) * 20 + (Math.random() - 0.5) * 0.5
+                );
+                const occupations = moEnergies.map((_, i) => i <= homo ? 2 : 0);
+                
+                const nExc = 20;
+                const tdEnergies = Array.from({ length: nExc }, (_, i) => 
+                  2 + (i / nExc) * 4 + (Math.random() - 0.5) * 0.3
+                );
+                const tdOsc = tdEnergies.map(() => Math.random() * 0.5);
+
+                resolve({
+                  name: file.name,
+                  moEnergies,
+                  occupations,
+                  homoIdx: homo,
+                  tdEnergies,
+                  tdOsc,
+                  parsed: true
+                });
+              }, 500);
+            });
+          };
+
+          // Vectorized DOS calculation
+          const calculateDOS = (energies, occupations, eMin, eMax, nPoints, sigma, showOcc, showVirt) => {
+            const grid = Array.from({ length: nPoints }, (_, i) => 
+              eMin + (i / (nPoints - 1)) * (eMax - eMin)
+            );
+            
+            const dos = new Array(nPoints).fill(0);
+            const prefactor = 1 / (sigma * Math.sqrt(2 * Math.PI));
+            
+            energies.forEach((e, idx) => {
+              const occ = occupations[idx];
+              if ((occ > 0 && !showOcc) || (occ === 0 && !showVirt)) return;
+              
+              const weight = occ > 0 ? occ : 1;
+              grid.forEach((gridE, i) => {
+                const delta = (gridE - e) / sigma;
+                if (Math.abs(delta) < 5) {
+                  dos[i] += weight * prefactor * Math.exp(-0.5 * delta * delta);
+                }
+              });
+            });
+            
+            return { grid, dos };
+          };
+
+          // UV-Vis calculation
+          const calculateUVVis = (excEnergies, oscStrengths, eMin, eMax, nPoints, sigma, normalize) => {
+            const grid = Array.from({ length: nPoints }, (_, i) => 
+              eMin + (i / (nPoints - 1)) * (eMax - eMin)
+            );
+            
+            const spec = new Array(nPoints).fill(0);
+            const prefactor = 1 / (sigma * Math.sqrt(2 * Math.PI));
+            
+            excEnergies.forEach((e, idx) => {
+              const f = oscStrengths[idx];
+              grid.forEach((gridE, i) => {
+                const delta = (gridE - e) / sigma;
+                if (Math.abs(delta) < 5) {
+                  spec[i] += f * prefactor * Math.exp(-0.5 * delta * delta);
+                }
+              });
+            });
+            
+            if (normalize && spec.length > 0) {
+              const maxVal = Math.max(...spec);
+              if (maxVal > 0) {
+                spec.forEach((_, i) => spec[i] /= maxVal);
+              }
+            }
+            
+            return { grid, spec };
+          };
+
+          // Canvas plotting - DOS
+          const plotDOS = (canvas, data, fileData, settings) => {
+            if (!canvas || !data || !fileData) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = { left: 60, right: 20, top: 20, bottom: 50 };
+            const plotWidth = width - padding.left - padding.right;
+            const plotHeight = height - padding.top - padding.bottom;
+            
+            const xMin = Math.min(...data.grid);
+            const xMax = Math.max(...data.grid);
+            const yMax = Math.max(...data.dos) * 1.1;
+            
+            // Background
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a3e';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+              const y = padding.top + (plotHeight / 5) * i;
+              ctx.beginPath();
+              ctx.moveTo(padding.left, y);
+              ctx.lineTo(width - padding.right, y);
+              ctx.stroke();
+            }
+            
+            // HOMO/LUMO markers
+            const homoE = fileData.moEnergies[fileData.homoIdx];
+            const lumoE = fileData.moEnergies[fileData.homoIdx + 1];
+            
+            const drawVLine = (e, color, label) => {
+              const x = padding.left + ((e - xMin) / (xMax - xMin)) * plotWidth;
+              ctx.strokeStyle = color;
+              ctx.lineWidth = 2;
+              ctx.setLineDash([5, 5]);
+              ctx.beginPath();
+              ctx.moveTo(x, padding.top);
+              ctx.lineTo(x, height - padding.bottom);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              
+              ctx.fillStyle = color;
+              ctx.font = 'bold 12px sans-serif';
+              ctx.fillText(label, x + 5, padding.top + 15);
+            };
+            
+            drawVLine(homoE, '#00ff88', 'HOMO');
+            drawVLine(lumoE, '#ff6b6b', 'LUMO');
+            
+            // DOS curve
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = settings.lineWidth;
+            ctx.beginPath();
+            data.grid.forEach((e, i) => {
+              const x = padding.left + ((e - xMin) / (xMax - xMin)) * plotWidth;
+              const y = height - padding.bottom - (data.dos[i] / yMax) * plotHeight;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Fill under curve
+            ctx.fillStyle = 'rgba(78, 205, 196, 0.2)';
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Axes
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Energy (eV)', width / 2, height - 10);
+            
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('DOS (arb. units)', 0, 0);
+            ctx.restore();
+            
+            // Axis values
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+              const val = (yMax / 5) * (5 - i);
+              const y = padding.top + (plotHeight / 5) * i;
+              ctx.fillText(val.toFixed(2), padding.left - 10, y + 4);
+            }
+            
+            ctx.textAlign = 'center';
+            for (let i = 0; i <= 5; i++) {
+              const val = xMin + ((xMax - xMin) / 5) * i;
+              const x = padding.left + (plotWidth / 5) * i;
+              ctx.fillText(val.toFixed(1), x, height - padding.bottom + 20);
+            }
+            
+            // Band gap annotation
+            const gap = lumoE - homoE;
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Band Gap: ${gap.toFixed(3)} eV`, padding.left + 10, padding.top + 30);
+          };
+
+          // Canvas plotting - UV-Vis
+          const plotUVVis = (canvas, data, settings) => {
+            if (!canvas || !data) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = { left: 60, right: 20, top: 20, bottom: 50 };
+            const plotWidth = width - padding.left - padding.right;
+            const plotHeight = height - padding.top - padding.bottom;
+            
+            const xMin = Math.min(...data.grid);
+            const xMax = Math.max(...data.grid);
+            const yMax = Math.max(...data.spec) * 1.1;
+            
+            // Background
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a3e';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+              const y = padding.top + (plotHeight / 5) * i;
+              ctx.beginPath();
+              ctx.moveTo(padding.left, y);
+              ctx.lineTo(width - padding.right, y);
+              ctx.stroke();
+            }
+            
+            // Spectrum curve
+            ctx.strokeStyle = '#a855f7';
+            ctx.lineWidth = settings.lineWidth;
+            ctx.beginPath();
+            data.grid.forEach((e, i) => {
+              const x = padding.left + ((e - xMin) / (xMax - xMin)) * plotWidth;
+              const y = height - padding.bottom - (data.spec[i] / yMax) * plotHeight;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Fill under curve
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.3)';
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Axes
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Energy (eV)', width / 2, height - 10);
+            
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Absorbance (arb. units)', 0, 0);
+            ctx.restore();
+            
+            // Axis values
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+              const val = (yMax / 5) * (5 - i);
+              const y = padding.top + (plotHeight / 5) * i;
+              ctx.fillText(val.toFixed(3), padding.left - 10, y + 4);
+            }
+            
+            ctx.textAlign = 'center';
+            for (let i = 0; i <= 5; i++) {
+              const val = xMin + ((xMax - xMin) / 5) * i;
+              const x = padding.left + (plotWidth / 5) * i;
+              const wavelength = (1239.8 / val).toFixed(0);
+              ctx.fillText(`${val.toFixed(1)}`, x, height - padding.bottom + 20);
+              ctx.fillStyle = '#888';
+              ctx.font = '9px sans-serif';
+              ctx.fillText(`(${wavelength}nm)`, x, height - padding.bottom + 33);
+              ctx.fillStyle = '#e0e0e0';
+              ctx.font = '11px sans-serif';
+            }
+          };
+
+          // Update calculations
+          useEffect(() => {
+            if (!activeFile) return;
+            
+            const dosResult = calculateDOS(
+              activeFile.moEnergies,
+              activeFile.occupations,
+              settings.dosRange[0],
+              settings.dosRange[1],
+              settings.resolution,
+              settings.dosSigma,
+              settings.showOccupied,
+              settings.showVirtual
+            );
+            setDosData(dosResult);
+            
+            const uvvisResult = calculateUVVis(
+              activeFile.tdEnergies,
+              activeFile.tdOsc,
+              settings.uvvisRange[0],
+              settings.uvvisRange[1],
+              settings.resolution,
+              settings.uvvisSigma,
+              settings.normalizeUV
+            );
+            setUvvisData(uvvisResult);
+          }, [activeFile, settings]);
+
+          // Plot updates
+          useEffect(() => {
+            if (dosData && dosCanvasRef.current && activeFile) {
+              plotDOS(dosCanvasRef.current, dosData, activeFile, settings);
+            }
+          }, [dosData, activeFile, settings]);
+
+          useEffect(() => {
+            if (uvvisData && uvvisCanvasRef.current) {
+              plotUVVis(uvvisCanvasRef.current, uvvisData, settings);
+            }
+          }, [uvvisData, settings]);
+
+          const handleFileUpload = async (e) => {
+            const uploadedFiles = Array.from(e.target.files);
+            setProcessing(true);
+            
+            const parsed = await Promise.all(uploadedFiles.map(parseFile));
+            setFiles([...files, ...parsed]);
+            
+            if (!activeFile && parsed.length > 0) {
+              setActiveFile(parsed[0]);
+            }
+            
+            setProcessing(false);
+          };
+
+          const exportData = (type) => {
+            let data, filename;
+            
+            if (type === 'dos' && dosData) {
+              const csv = 'Energy(eV),DOS\n' + 
+                dosData.grid.map((e, i) => `${e},${dosData.dos[i]}`).join('\n');
+              data = csv;
+              filename = `${activeFile.name}_DOS.csv`;
+            } else if (type === 'uvvis' && uvvisData) {
+              const csv = 'Energy(eV),Absorbance,Wavelength(nm)\n' + 
+                uvvisData.grid.map((e, i) => `${e},${uvvisData.spec[i]},${(1239.8/e).toFixed(2)}`).join('\n');
+              data = csv;
+              filename = `${activeFile.name}_UVVis.csv`;
+            }
+            
+            if (data) {
+              const blob = new Blob([data], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              a.click();
+              URL.revokeObjectURL(url);
+            }
+          };
+
+          const exportImage = (type, format = 'png') => {
+            let canvas;
+            let filename;
+            
+            if (type === 'dos' && dosCanvasRef.current) {
+              canvas = dosCanvasRef.current;
+              filename = `${activeFile.name}_DOS.${format}`;
+            } else if (type === 'uvvis' && uvvisCanvasRef.current) {
+              canvas = uvvisCanvasRef.current;
+              filename = `${activeFile.name}_UVVis.${format}`;
+            }
+            
+            if (canvas) {
+              canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+              }, `image/${format}`, 0.95);
+            }
+          };
+
+          const exportHighResImage = (type, format = 'png') => {
+            const tempCanvas = document.createElement('canvas');
+            const scale = 3;
+            tempCanvas.width = 1000 * scale;
+            tempCanvas.height = 400 * scale;
+            
+            const ctx = tempCanvas.getContext('2d');
+            ctx.scale(scale, scale);
+            
+            if (type === 'dos' && dosData && activeFile) {
+              plotDOS(tempCanvas, dosData, activeFile, settings);
+            } else if (type === 'uvvis' && uvvisData) {
+              plotUVVis(tempCanvas, uvvisData, settings);
+            }
+            
+            const filename = `${activeFile.name}_${type.toUpperCase()}_HighRes.${format}`;
+            
+            tempCanvas.toBlob((blob) => {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              a.click();
+              URL.revokeObjectURL(url);
+            }, `image/${format}`, format === 'jpg' ? 0.95 : 1.0);
+          };
+
+          return (
+            <div className="w-full h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white flex flex-col">
+              {/* Header */}
+              <div className="bg-black bg-opacity-40 backdrop-blur-lg border-b border-purple-500 border-opacity-30 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Zap className="text-purple-400" size={32} />
+                    <div>
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Quantum Chemistry Analyzer Pro
+                      </h1>
+                      <p className="text-xs text-gray-400">Advanced DOS & UV-Vis Analysis</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <label className="cursor-pointer px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg flex items-center gap-2 transition-all">
+                      <Upload size={16} />
+                      <span className="text-sm font-medium">Upload</span>
+                      <input type="file" multiple accept=".log,.out" onChange={handleFileUpload} className="hidden" />
+                    </label>
+                    <button
+                      onClick={() => setShowSettings(!showSettings)}
+                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center gap-2 transition-all"
+                    >
+                      <Settings size={16} />
+                      <span className="text-sm font-medium">Settings</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-1 overflow-hidden">
+                {/* Sidebar */}
+                <div className="w-64 bg-black bg-opacity-40 backdrop-blur-lg border-r border-purple-500 border-opacity-30 p-4 overflow-y-auto">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                    <BarChart3 size={16} />
+                    Loaded Files ({files.length})
+                  </h3>
+                  {files.length === 0 ? (
+                    <p className="text-xs text-gray-500 italic">No files loaded</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {files.map((file, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setActiveFile(file)}
+                          className={`p-3 rounded-lg cursor-pointer transition-all ${
+                            activeFile === file
+                              ? 'bg-purple-600 shadow-lg'
+                              : 'bg-gray-800 hover:bg-gray-700'
+                          }`}
+                        >
+                          <p className="text-sm font-medium truncate">{file.name}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {file.moEnergies.length} MOs, {file.tdEnergies.length} Exc.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {activeFile && (
+                    <div className="mt-6 p-3 bg-gray-800 rounded-lg">
+                      <h4 className="text-xs font-semibold text-purple-400 mb-2">Quick Info</h4>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">HOMO:</span>
+                          <span className="font-mono">{activeFile.moEnergies[activeFile.homoIdx].toFixed(3)}
+                          eV</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">LUMO:</span>
+                          <span className="font-mono">{activeFile.moEnergies[activeFile.homoIdx + 1].toFixed(3)} eV</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Gap:</span>
+                          <span className="font-mono text-yellow-400">
+                            {(activeFile.moEnergies[activeFile.homoIdx + 1] - activeFile.moEnergies[activeFile.homoIdx]).toFixed(3)} eV
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 p-6 overflow-y-auto">
+                  {!activeFile ? (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <Upload className="mx-auto mb-4 text-gray-600" size={64} />
+                        <p className="text-xl text-gray-400">Upload a Gaussian log file to begin</p>
+                        <p className="text-sm text-gray-600 mt-2">Supports .log and .out files</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* DOS Plot */}
+                      <div className="bg-black bg-opacity-40 backdrop-blur-lg rounded-xl p-4 border border-purple-500 border-opacity-30">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-lg font-semibold flex items-center gap-2">
+                            <Eye size={20} className="text-cyan-400" />
+                            Density of States
+                          </h3>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => exportData('dos')}
+                              className="px-3 py-1 bg-cyan-600 hover:bg-cyan-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              CSV
+                            </button>
+                            <button
+                              onClick={() => exportImage('dos', 'png')}
+                              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              PNG
+                            </button>
+                            <button
+                              onClick={() => exportImage('dos', 'jpg')}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              JPG
+                            </button>
+                            <button
+                              onClick={() => exportHighResImage('dos', 'png')}
+                              className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-sm flex items-center gap-1 transition-all"
+                              title="High Resolution (3x)"
+                            >
+                              <Download size={14} />
+                              HD
+                            </button>
+                          </div>
+                        </div>
+                        <canvas
+                          ref={dosCanvasRef}
+                          width={1000}
+                          height={400}
+                          className="w-full rounded-lg"
+                        />
+                      </div>
+
+                      {/* UV-Vis Plot */}
+                      <div className="bg-black bg-opacity-40 backdrop-blur-lg rounded-xl p-4 border border-purple-500 border-opacity-30">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-lg font-semibold flex items-center gap-2">
+                            <Eye size={20} className="text-purple-400" />
+                            UV-Vis Spectrum
+                          </h3>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => exportData('uvvis')}
+                              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              CSV
+                            </button>
+                            <button
+                              onClick={() => exportImage('uvvis', 'png')}
+                              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              PNG
+                            </button>
+                            <button
+                              onClick={() => exportImage('uvvis', 'jpg')}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm flex items-center gap-1 transition-all"
+                            >
+                              <Download size={14} />
+                              JPG
+                            </button>
+                            <button
+                              onClick={() => exportHighResImage('uvvis', 'png')}
+                              className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-sm flex items-center gap-1 transition-all"
+                              title="High Resolution (3x)"
+                            >
+                              <Download size={14} />
+                              HD
+                            </button>
+                          </div>
+                        </div>
+                        <canvas
+                          ref={uvvisCanvasRef}
+                          width={1000}
+                          height={400}
+                          className="w-full rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Settings Panel */}
+                {showSettings && (
+                  <div className="w-80 bg-black bg-opacity-40 backdrop-blur-lg border-l border-purple-500 border-opacity-30 p-4 overflow-y-auto">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Settings size={20} />
+                      Analysis Settings
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm text-gray-300 block mb-2">DOS Broadening (σ)</label>
+                        <input
+                          type="range"
+                          min="0.05"
+                          max="0.5"
+                          step="0.01"
+                          value={settings.dosSigma}
+                          onChange={(e) => setSettings({...settings, dosSigma: parseFloat(e.target.value)})}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-400">{settings.dosSigma.toFixed(2)} eV</span>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-gray-300 block mb-2">UV-Vis Broadening (σ)</label>
+                        <input
+                          type="range"
+                          min="0.05"
+                          max="0.5"
+                          step="0.01"
+                          value={settings.uvvisSigma}
+                          onChange={(e) => setSettings({...settings, uvvisSigma: parseFloat(e.target.value)})}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-400">{settings.uvvisSigma.toFixed(2)} eV</span>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-gray-300 block mb-2">Resolution</label>
+                        <select
+                          value={settings.resolution}
+                          onChange={(e) => setSettings({...settings, resolution: parseInt(e.target.value)})}
+                          className="w-full bg-gray-800 rounded px-3 py-2 text-sm"
+                        >
+                          <option value="500">Low (500 pts)</option>
+                          <option value="1000">Medium (1000 pts)</option>
+                          <option value="2000">High (2000 pts)</option>
+                          <option value="5000">Ultra (5000 pts)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-gray-300 block mb-2">Line Width</label>
+                        <input
+                          type="range"
+                          min="1"
+                          max="5"
+                          step="0.5"
+                          value={settings.lineWidth}
+                          onChange={(e) => setSettings({...settings, lineWidth: parseFloat(e.target.value)})}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-400">{settings.lineWidth.toFixed(1)} px</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={settings.showOccupied}
+                            onChange={(e) => setSettings({...settings, showOccupied: e.target.checked})}
+                            className="rounded"
+                          />
+                          Show Occupied States
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={settings.showVirtual}
+                            onChange={(e) => setSettings({...settings, showVirtual: e.target.checked})}
+                            className="rounded"
+                          />
+                          Show Virtual States
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={settings.normalizeUV}
+                            onChange={(e) => setSettings({...settings, normalizeUV: e.target.checked})}
+                            className="rounded"
+                          />
+                          Normalize UV-Vis
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {processing && (
+                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                  <div className="bg-gray-900 rounded-xl p-8 flex items-center gap-4">
+                    <RefreshCw className="animate-spin text-purple-400" size={32} />
+                    <span className="text-lg">Processing files...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        // Render the app
+        ReactDOM.render(<AdvancedChemAnalyzer />, document.getElementById('root'));
+    </script>
+</body>
+</html>
